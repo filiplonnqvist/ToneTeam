@@ -1,0 +1,160 @@
+<style>
+  body, main {
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  header, footer {
+    display: none !important;
+  }
+  
+  .form-container {
+    min-height: 320px; /* Min height for the form container */
+  }
+</style>
+
+<div class="fixed inset-0 z-50 flex h-screen w-screen overflow-hidden">
+  <div class="w-1/2 flex flex-col items-center justify-start pt-28 pb-10 px-12 bg-white">
+    <div class="mb-4 -mt-6 overflow-hidden">
+      <img src="/img/icon_pink_2.png" alt="ToneTeam Logo" class="max-h-[8rem] w-auto">
+    </div>
+    
+    <!-- Auth Container -->
+    <div id="auth-container" class="w-full max-w-md font-['Oxanium']">
+
+      <!-- Login/Register Tabs -->
+      <div class="flex w-full mb-6 border-b border-gray-300">
+        <button id="login-tab" class="py-3 px-6 font-medium text-gray-800 border-b-2 border-blue-500 flex-1 text-center active">LOG IN</button>
+        <button id="register-tab" class="py-3 px-6 font-medium text-gray-500 hover:text-gray-800 border-b-2 border-transparent flex-1 text-center">REGISTER</button>
+      </div>
+
+      <!-- Form container -->
+      <div class="form-container">
+        <!-- Login Container -->
+        <div id="login-container">
+
+          <!-- Error message container for login -->
+          <div id="login-error" class="px-4 py-2 mb-4 text-sm text-red-600 bg-red-100 rounded-md text-center hidden"></div>
+          <!-- Success message container for login -->
+          <div id="login-success" class="px-4 py-2 mb-4 text-sm text-green-600 bg-green-100 rounded-md text-center hidden"></div>
+
+          <!-- Login Form -->
+          <form id="login-form" class="flex flex-col w-full">
+
+            <!-- Email input -->
+            <div class="mb-4">
+              <label for="login-email" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                <!-- Email input -->
+                <input name="email" type="email" id="login-email" required placeholder="your.name@email.com" 
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 !font-sans !font-normal">
+            </div>
+
+            <!-- Password input -->
+            <div class="mb-6">
+              <label for="login-password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+              <!-- Password input -->
+              <input name="password" type="password" id="login-password" required placeholder="••••••••" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 !font-sans !font-normal">
+            </div>
+
+            <!-- Submit button with loader -->
+            <div class="relative mb-6 flex justify-center">
+              <button type="submit" id="login-submit" 
+                      class="w-1/2 bg-gradient-to-r from-rose-500 to-purple-800 text-white py-3 px-4 rounded-full hover:from-rose-600 hover:to-purple-900 transition-all duration-300 shadow-lg shadow-rose-500/20 hover:shadow-purple-800/30">
+                LOG IN
+              </button>
+              <div id="login-loader" class="absolute w-1/2 h-full items-center justify-center bg-gradient-to-r from-rose-500 to-purple-800 rounded-full hidden">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+            </div> 
+          </form>
+        </div>
+
+        <!-- Register Container (hidden initially) -->
+        <div id="register-container" class="hidden font-['Oxanium']">
+          <!-- Error message container for register -->
+          <div id="register-error" class="px-4 py-2 mb-4 text-sm text-red-600 bg-red-100 rounded-md text-center hidden"></div>
+
+          <!-- Register Form -->
+          <form id="register-form" class="flex flex-col w-full" novalidate>
+
+            <!-- Email input -->
+            <div class="mb-4">
+              <label for="register-email" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                <!-- Email input -->
+                <input name="email" type="email" id="register-email" required placeholder="your.name@email.com" 
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 !font-sans !font-normal">
+            </div>
+
+            <!-- Password input -->
+            <div class="mb-4">
+              <label for="register-password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+              <input name="password" type="password" id="register-password" required placeholder="••••••••" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 !font-sans !font-normal">
+            </div>
+
+            <!-- Confirm password input -->
+            <div class="mb-6">
+              <label for="register-password-confirm" class="block text-gray-700 text-sm font-medium mb-2">Confirm password</label>
+              <input type="password" id="register-password-confirm" required placeholder="••••••••" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 !font-sans !font-normal">
+            </div>
+
+            <!-- Register button with loader -->
+            <div class="relative mb-6 flex font-['Oxanium'] justify-center">
+              <button type="submit" id="register-submit" 
+                      class="w-1/2 bg-gradient-to-r from-rose-500 to-purple-800 text-white py-3 px-4 rounded-full hover:from-rose-600 hover:to-purple-900 transition-all duration-300 shadow-lg shadow-rose-500/20 hover:shadow-purple-800/30">
+                CREATE ACCOUNT
+              </button>
+              <div id="register-loader" class="absolute w-1/2 h-full items-center justify-center bg-gradient-to-r from-rose-500 to-purple-800 rounded-full hidden">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="w-1/2 relative overflow-hidden">
+  <!-- Background image -->
+  <img src="/img/background_music_room.png" alt="Music Room" class="absolute inset-0 h-full w-full object-cover z-0">
+  
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-60 z-10"></div>
+  
+  <!-- Content with z-index to be on top and visible -->
+  <div class="relative z-20 h-full">
+    <%- include('../partials/home-info') %>
+  </div>
+</div>
+
+
+</div>
+
+<!-- If there's a server error, hide this for auth-service.js to fetch -->
+<% if (typeof registerError !== 'undefined' && registerError) { %>
+  <div data-server-register-error class="hidden"><%= registerError %></div>
+<% } %>
+
+<!-- Initialize Auth UI -->
+<script type="module">
+  import { initAuthService } from '/js/services/auth-service.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize auth service
+    initAuthService({
+      onAuthenticated: (user) => {
+        window.location.href = '/music-room';
+      }
+    });
+  });
+</script>

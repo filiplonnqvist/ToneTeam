@@ -1,0 +1,33 @@
+# Dependency directories
+node_modules
+npm-debug.log
+
+# Version control
+.git
+.gitignore
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Editor directories and files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+
+# Build directories
+dist
+build
+
+# Docker files (to avoid recursive copying)
+docker-compose*.yml
+.dockerignore
+
+# OS generated files
+.DS_Store
+Thumbs.db

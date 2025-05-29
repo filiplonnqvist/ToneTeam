@@ -1,0 +1,27 @@
+FROM node:23-slim
+
+# Set production environment directly
+ENV NODE_ENV=production
+
+# Set workdir
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies
+RUN npm ci --omit=dev
+
+# Copy application files
+COPY . .
+
+# Build the CSS file
+RUN npm run build:css
+
+# Security measures
+RUN groupadd -r nodejs && useradd -r -g nodejs nodejs
+USER nodejs
+
+# Final steps
+EXPOSE 3000
+CMD ["npm", "start"]

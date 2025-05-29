@@ -1,0 +1,111 @@
+# GitLab CI/CD configuration file for 1dv613 project course
+
+# Script to run before deploy-job
+.before_script_ssh_setup: &before_script_ssh_setup
+  - apk update && apk add openssh-client
+  - eval $(ssh-agent -s)
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - ssh-keyscan -H $PRODUCTION_HOST >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+
+image: docker:27-cli
+
+stages:
+  - lint
+  - test 
+  - build
+  - deploy
+
+# Code linting
+lint-job:
+  stage: lint
+  image:
+    name: node:20-bullseye
+    entrypoint: [""]
+  script:
+    - echo "Installing dependencies..."
+    - npx install-peerdeps --dev @lnu/eslint-config # Update this to your own ESLint config if needed
+    - echo "Linting..."
+    - npx eslint "src/**/*.js" || exit 1 # or .ts if using TypeScript
+
+# Auth test
+test-job:
+  stage: test
+  image:
+    name: node:20-bullseye
+    entrypoint: [""]
+  script:
+    - echo "Installing dependencies..."
+    - npm ci
+    - echo "Running tests..."
+    - npm test
+  needs:
+    - lint-job
+
+# Build the application using Docker and Kaniko
+build-job:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script:
+    - echo "Building Docker image with Kaniko..."
+    - /kaniko/executor --context "${CI_PROJECT_DIR}" --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.production" --destination "${CI_REGISTRY_IMAGE}/toneteam:${CI_COMMIT_SHORT_SHA}" --destination "${CI_REGISTRY_IMAGE}/toneteam:latest"
+  needs:
+    - test-job
+
+# Deploy the application to the remote server using SSH
+deploy-job:
+  stage: deploy
+  environment:
+    name: production
+    url: http://$PRODUCTION_HOST
+  before_script: *before_script_ssh_setup
+  script:
+    - |
+      ssh ubuntu@$PRODUCTION_HOST "
+        # Login to registry
+        docker login -u $CI_REGISTRY_USER -p '$CI_REGISTRY_PASSWORD' $CI_REGISTRY
+        
+        # Pull new image
+        docker pull $CI_REGISTRY_IMAGE/toneteam:${CI_COMMIT_SHORT_SHA}
+      "
+    
+    # Copy docker-compose file to the server
+    - scp docker/docker-compose-production.yml ubuntu@$PRODUCTION_HOST:/home/ubuntu/toneteam/
+    
+    # Handle environment variables for production
+    - echo "$ENV_FILE" > .env.tmp
+    - scp .env.tmp ubuntu@$PRODUCTION_HOST:/home/ubuntu/toneteam/.env
+    - rm .env.tmp
+    
+    # Stopping old containers and starting new ones
+    - |
+      ssh ubuntu@$PRODUCTION_HOST "
+        cd /home/ubuntu/toneteam
+        
+        # Adapt docker-compose file
+        export CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+        export CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
+        
+        echo '--- Stopping existing containers ---'
+        docker compose -f docker-compose-production.yml down || true
+        
+        echo '--- Starting new containers ---'
+        docker compose -f docker-compose-production.yml up -d --force-recreate
+        
+        # Wait and check status
+        sleep 10
+        echo '--- Container Status ---'
+        docker compose -f docker-compose-production.yml ps
+
+        # Erase unused images to save disk space
+        echo '--- Cleaning up unused Docker images ---'
+        docker image prune -af
+      "
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  needs:
+    - build-job

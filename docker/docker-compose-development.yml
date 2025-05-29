@@ -1,0 +1,39 @@
+services:
+  # Node.js applikationen
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.development
+    container_name: toneteam-app
+    restart: "no"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    env_file:
+      - ../.env
+    volumes:
+      - ../src:/usr/src/app/src          # Volume mapping for source code
+      - ../public:/usr/src/app/public    # Volume mapping for static files
+
+    networks:
+      - toneteam-network
+
+  # MongoDB databas
+  mongo:
+    image: mongo:latest
+    container_name: toneteam-mongo
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - toneteam-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  toneteam-network:
+    driver: bridge

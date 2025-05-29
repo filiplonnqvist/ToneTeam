@@ -1,0 +1,29 @@
+services:
+  app:
+    image: ${CI_REGISTRY_IMAGE}/toneteam:${CI_COMMIT_SHORT_SHA}  # Versionsbaserad image
+    container_name: toneteam-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    env_file:
+      - ./.env
+    networks:
+      - toneteam-network
+
+  mongo:
+    image: mongo:latest
+    container_name: toneteam-mongo
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - toneteam-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  toneteam-network:
+    driver: bridge
