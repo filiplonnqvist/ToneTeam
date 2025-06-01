@@ -9,7 +9,7 @@ ToneTeam is a web-based platform where users can play piano, write lyrics, and c
 
 **Current Status:** MVP (*Minimum Viable Product*) - Core features implemented, collaboration features in development.
 
-**Deployed at:** [https://toneteam.duckdns.org/](https://toneteam.duckdns.org/)
+**Deployed at:** [https://toneteam.se/](https://toneteam.se/)
 
 ## Demo
 
